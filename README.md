@@ -11,7 +11,7 @@ https://github.com/abhishek-bodapati/Online-Interpreter-with-Kafka.git && cd Onl
 ```
 
 ## Setup
-- Install and start [Apache Zookeeper](https://zookeeper.apache.org]) and [Apache Kafka](https://kafka.apache.org/) services
+- Install and start [Apache Zookeeper](https://zookeeper.apache.org) and [Apache Kafka](https://kafka.apache.org/) services
 ```
 pip install -r requirements.txt
 npm install
