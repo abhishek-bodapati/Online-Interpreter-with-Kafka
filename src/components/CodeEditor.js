@@ -2,6 +2,7 @@ import React from 'react';
 import {UnControlled as CodeMirror} from 'react-codemirror2';
 import './Editor.css';
 import 'codemirror/lib/codemirror.css';
+import 'codemirror/theme/blackboard.css';
 require('codemirror/mode/python/python');
 
 const state = {
@@ -17,15 +18,11 @@ const handleInputChange = (event) => {
 
 const componentDidMount = () => {
     const ws = new WebSocket(state.endpoint);
-    const ws1 = new WebSocket("ws://localhost:8766");
     ws.onopen = () => {
         console.log("Connected to Websocket 8765");
         ws.send(JSON.stringify({message:state.code, inputs:state.inputs}));
     }
-    ws1.onopen = () => {
-        console.log("Connected to Websocket 8766");
-    }
-    ws1.onmessage = (evt) => {
+    ws.onmessage = (evt) => {
         console.log(evt.data);
         state.messages = evt.data;
         document.getElementById("loadarea").innerHTML = 'Run';
@@ -55,6 +52,7 @@ print("hi")'
                                 mode: 'python',
                                 lineNumbers: true,
                                 smartIndent: true,
+                                theme: 'blackboard'
                             }}
                             onChange={(editor, data, value) => {
                                 state.code = value

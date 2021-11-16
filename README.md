@@ -21,13 +21,10 @@ npm install
 - Run the below commands in new terminal tabs
 
 ```
-python listener.py
+python server.py
 ```
 ```
 python consumer.py
-```
-```
-python echoserver.py
 ```
 ```
 npm start
