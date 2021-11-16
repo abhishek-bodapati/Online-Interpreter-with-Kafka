@@ -12,11 +12,25 @@ clients = {}
 LISTEN_PORT = 8765
 LISTEN_ADDRESS = '127.0.0.1'
 
-# Kafka producer for code (which is to be sent to the compiler)
+# Kafka producer for code (which is to be sent for compilation)
 listener_producer = KafkaProducer(
     bootstrap_servers = ['localhost:9092'],
     api_version=(0, 10, 1),
     value_serializer=lambda v: json.dumps(v).encode('utf-8'))
+
+# Consume the output from response queue and send back to client
+@gen.coroutine
+def consume():
+    c = _clients.SingleConsumer(brokers=["localhost:9092"])
+
+    yield c.connect()
+
+    while True:
+        msgs = yield c.consume("result")
+        for msg in msgs:
+            client_id = json.loads(msg)["client_id"]
+            output = json.loads(msg)["output"]
+            clients[client_id].write_message(output) # Sends the output to specified client_id
 
 class WebSocketHandler(tornado.websocket.WebSocketHandler):
 
@@ -52,21 +66,6 @@ class WebSocketHandler(tornado.websocket.WebSocketHandler):
 application = tornado.web.Application([
         (r"/", WebSocketHandler),
 ])
-
-# Consume the output from response queue and send back to client
-@gen.coroutine
-def consume():
-    c = _clients.SingleConsumer(brokers=["localhost:9092"])
-
-    yield c.connect()
-
-    while True:
-        msgs = yield c.consume("result")
-        for msg in msgs:
-            client_id = json.loads(msg)["client_id"]
-            output = json.loads(msg)["output"]
-            clients[client_id].write_message(output)
-            clients[client_id].write_message(output)
 
 if __name__ == "__main__":
     # Setup HTTP Server
